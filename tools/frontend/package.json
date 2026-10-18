@@ -1,0 +1,18 @@
+{
+  "name": "markforge-frontend-vendor",
+  "private": true,
+  "description": "打包 MarkForge Editor 使用的 CodeMirror 6 → crates/editor/web/vendor/codemirror.js（產物納入版本控制，建置 Rust 時不需要 Node）",
+  "scripts": {
+    "build": "esbuild entry.js --bundle --format=iife --global-name=CM --minify --legal-comments=eof --target=chrome110 --outfile=../../crates/editor/web/vendor/codemirror.js"
+  },
+  "devDependencies": {
+    "@codemirror/commands": "^6",
+    "@codemirror/lang-markdown": "^6",
+    "@codemirror/language": "^6",
+    "@codemirror/search": "^6",
+    "@codemirror/state": "^6",
+    "@codemirror/view": "^6",
+    "@lezer/highlight": "^1",
+    "esbuild": "^0.25"
+  }
+}
