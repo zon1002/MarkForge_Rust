@@ -1,0 +1,132 @@
+/* MarkForge 預覽樣式（GitHub 風格）。字型、字級、閱讀寬度以 CSS 變數由頁面覆寫：
+   --mf-font-family、--mf-font-size、--mf-width（none = 不限制寬度）。 */
+:root {
+  --mf-bg: #ffffff;
+  --mf-fg: #1f2328;
+  --mf-muted: #59636e;
+  --mf-border: #d1d9e0;
+  --mf-code-bg: #f6f8fa;
+  --mf-link: #0969da;
+  --mf-blockquote: #59636e;
+  --mf-font-family: "Segoe UI", -apple-system, "Microsoft JhengHei", Helvetica, Arial, sans-serif;
+  --mf-font-size: 16px;
+  --mf-width: 860px;
+}
+html[data-theme="dark"] {
+  --mf-bg: #0d1117;
+  --mf-fg: #e6edf3;
+  --mf-muted: #9198a1;
+  --mf-border: #30363d;
+  --mf-code-bg: #161b22;
+  --mf-link: #4493f8;
+  --mf-blockquote: #9198a1;
+}
+html {
+  /* 捲動位置由同步捲動腳本自行控制；Chromium 的捲動錨定會在 Mermaid 非同步畫完、
+     頁面變高時偷偷調整 scrollY，被同步腳本誤判為使用者捲動而互相拉扯。 */
+  overflow-anchor: none;
+}
+.markdown-body {
+  box-sizing: border-box;
+  max-width: var(--mf-width);
+  margin: 0 auto;
+  padding: 28px 32px 80px;
+  font-family: var(--mf-font-family);
+  font-size: var(--mf-font-size);
+  line-height: 1.6;
+  word-wrap: break-word;
+  color: var(--mf-fg);
+}
+.markdown-body *, .markdown-body *::before, .markdown-body *::after { box-sizing: border-box; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3,
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  line-height: 1.25;
+}
+.markdown-body h1 { font-size: 2em; padding-bottom: .3em; border-bottom: 1px solid var(--mf-border); }
+.markdown-body h2 { font-size: 1.5em; padding-bottom: .3em; border-bottom: 1px solid var(--mf-border); }
+.markdown-body h3 { font-size: 1.25em; }
+.markdown-body h4 { font-size: 1em; }
+.markdown-body h5 { font-size: .875em; }
+.markdown-body h6 { font-size: .85em; color: var(--mf-muted); }
+.markdown-body > :first-child { margin-top: 0; }
+.markdown-body p, .markdown-body ul, .markdown-body ol, .markdown-body dl,
+.markdown-body blockquote, .markdown-body table, .markdown-body pre {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.markdown-body a { color: var(--mf-link); text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body ul, .markdown-body ol { padding-left: 2em; }
+.markdown-body li + li { margin-top: .25em; }
+.markdown-body li.task-list-item { list-style: none; margin-left: -1.4em; }
+.markdown-body input[type="checkbox"] { margin-right: .5em; }
+.markdown-body blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0 1em;
+  color: var(--mf-blockquote);
+  border-left: .25em solid var(--mf-border);
+}
+.markdown-body code, .markdown-body tt, .markdown-body kbd {
+  background: var(--mf-code-bg);
+  padding: .2em .4em;
+  border-radius: 6px;
+  font-family: Consolas, "Cascadia Code", "SF Mono", Menlo, monospace;
+  font-size: 85%;
+}
+.markdown-body kbd { border: 1px solid var(--mf-border); border-bottom-width: 2px; }
+.markdown-body pre {
+  background: var(--mf-code-bg);
+  padding: 16px;
+  overflow: auto;
+  border-radius: 6px;
+  line-height: 1.45;
+}
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 85%;
+}
+.markdown-body pre code.hljs { padding: 0; background: transparent; }
+.markdown-body pre.mermaid {
+  background: transparent;
+  padding: 8px 0;
+  text-align: center;
+  line-height: normal;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+.markdown-body pre.mermaid svg { transform-origin: 0 0; }
+.markdown-body table {
+  border-collapse: collapse;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow: auto;
+}
+.markdown-body table th, .markdown-body table td {
+  border: 1px solid var(--mf-border);
+  padding: 6px 13px;
+}
+.markdown-body table th { font-weight: 600; }
+.markdown-body table tr:nth-child(2n) { background: var(--mf-code-bg); }
+.markdown-body img { max-width: 100%; box-sizing: content-box; }
+.markdown-body hr {
+  height: .25em;
+  padding: 0;
+  margin: 24px 0;
+  background: var(--mf-border);
+  border: 0;
+}
+.markdown-body dt { font-weight: 600; margin-top: 16px; }
+.markdown-body dd { margin-left: 0; padding: 0 16px; margin-bottom: 16px; }
+.markdown-body .footnotes { font-size: .85em; color: var(--mf-muted); border-top: 1px solid var(--mf-border); }
+
+@media print {
+  .markdown-body { max-width: none; padding: 0; }
+  .markdown-body pre.mermaid svg { transform: none !important; }
+}

@@ -1,0 +1,7 @@
+# 建置產物（可由 cargo build / publish.ps1 重新產生）
+/target
+/publish
+/installer_output
+*.pdb
+# 前端打包工具的相依套件（產物 crates/editor/web/vendor/ 會納入版本控制）
+/tools/frontend/node_modules

@@ -1,0 +1,10 @@
+[package]
+name = "markforge-core"
+description = "MarkForge 共用核心：Markdown 渲染、HTML 頁面範本、離線資源"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+comrak = { workspace = true }
+regex = { workspace = true }

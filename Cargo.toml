@@ -1,0 +1,24 @@
+[workspace]
+resolver = "3"
+members = ["crates/core"]
+
+[workspace.package]
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.92"
+
+[workspace.dependencies]
+markforge-core = { path = "crates/core" }
+comrak = { version = "0.56", default-features = false, features = ["shortcodes"] }
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+windows = "0.62"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "unwind"
+
+[profile.dev.package."*"]
+opt-level = 2
