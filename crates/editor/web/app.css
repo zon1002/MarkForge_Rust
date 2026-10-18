@@ -1,0 +1,208 @@
+/* MarkForge Editor 外框（工具列、窗格、狀態列、彈出選單、對話框）。
+   預覽內容的樣式在 /assets/markdown.css（與 Viewer、檔案總管預覽共用）。 */
+:root {
+  --ui-bg: #ffffff;
+  --ui-chrome: #f3f3f3;
+  --ui-border: #d0d7de;
+  --ui-text: #1f2328;
+  --ui-muted: #59636e;
+  --ui-hover: #e2e6ea;
+  --ui-pressed: #cfe3ff;
+  --ui-accent: #0969da;
+  --ui-icon: #404040;
+  --ed-bg: #ffffff;
+  --ed-text: #1f2328;
+  --ed-muted: #59636e;
+  --ed-list: #9a6200;
+  --ed-link: #0969da;
+  --ed-code-bg: #f6f8fa;
+  --ed-gutter: #8b949e;
+  --ed-active-line: #f6f8fa;
+  --ed-selection: #b6d6fd;
+}
+html[data-theme="dark"] {
+  --ui-bg: #0d1117;
+  --ui-chrome: #161b22;
+  --ui-border: #30363d;
+  --ui-text: #e6edf3;
+  --ui-muted: #9198a1;
+  --ui-hover: #262c36;
+  --ui-pressed: #1f3a5f;
+  --ui-accent: #4493f8;
+  --ui-icon: #c9d1d9;
+  --ed-bg: #0d1117;
+  --ed-text: #e6edf3;
+  --ed-muted: #9198a1;
+  --ed-list: #e3b341;
+  --ed-link: #4493f8;
+  --ed-code-bg: #161b22;
+  --ed-gutter: #6e7681;
+  --ed-active-line: #161b2280;
+  --ed-selection: #264f78;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+  font-size: 13px;
+}
+body { display: flex; flex-direction: column; }
+
+/* ---------- 工具列 ---------- */
+#toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 6px;
+  background: var(--ui-chrome);
+  border-bottom: 1px solid var(--ui-border);
+  user-select: none;
+}
+.tb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ui-text);
+  font: inherit;
+  cursor: default;
+}
+.tb-btn:hover { background: var(--ui-hover); border-color: var(--ui-border); }
+.tb-btn:active, .tb-btn.open { background: var(--ui-pressed); }
+.tb-btn svg { width: 16px; height: 16px; fill: var(--ui-icon); flex: none; }
+.tb-btn .caret { font-size: 9px; color: var(--ui-muted); margin-left: -1px; }
+.tb-split { display: inline-flex; }
+.tb-split .tb-btn:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.tb-split .tb-btn:last-child { padding: 0 4px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.tb-sep { width: 1px; height: 18px; margin: 0 4px; background: var(--ui-border); }
+
+/* ---------- 窗格 ---------- */
+#main { flex: 1; display: flex; min-height: 0; }
+#editor-pane { flex: 0 0 50%; min-width: 120px; overflow: hidden; background: var(--ed-bg); }
+#editor-pane .cm-editor { height: 100%; }
+#splitter { flex: 0 0 5px; cursor: col-resize; background: var(--ui-border); }
+#splitter:hover, #splitter.dragging { background: var(--ui-accent); }
+#preview-pane { flex: 1; min-width: 120px; overflow: auto; background: var(--mf-bg); }
+#main.hide-editor #editor-pane, #main.hide-editor #splitter { display: none; }
+#main.hide-preview #preview-pane, #main.hide-preview #splitter { display: none; }
+#main.hide-preview #editor-pane { flex: 1; }
+
+/* ---------- 狀態列 ---------- */
+#statusbar {
+  display: flex;
+  gap: 18px;
+  padding: 3px 10px;
+  background: var(--ui-chrome);
+  border-top: 1px solid var(--ui-border);
+  color: var(--ui-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+#st-path { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- 彈出選單（工具列下拉、右鍵選單） ---------- */
+#popup {
+  position: fixed;
+  z-index: 50;
+  min-width: 170px;
+  padding: 4px 0;
+  background: var(--ui-chrome);
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+  user-select: none;
+}
+.pm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 10px;
+  cursor: default;
+  white-space: nowrap;
+}
+.pm-item:hover { background: var(--ui-hover); }
+.pm-item.disabled { opacity: .45; pointer-events: none; }
+.pm-item svg { width: 15px; height: 15px; fill: var(--ui-icon); flex: none; }
+.pm-item .pm-icon { width: 15px; display: inline-flex; justify-content: center; }
+.pm-item .pm-key { margin-left: auto; padding-left: 24px; color: var(--ui-muted); font-size: 12px; }
+.pm-sep { height: 1px; margin: 4px 0; background: var(--ui-border); }
+
+/* ---------- 對話框 ---------- */
+#modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .35);
+}
+#modal-backdrop[hidden] { display: none; }
+#modal {
+  min-width: 360px;
+  max-width: 520px;
+  padding: 18px 20px 14px;
+  background: var(--ui-chrome);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+#modal h2 { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+#modal label { display: block; margin: 10px 0 4px; color: var(--ui-muted); }
+#modal input, #modal select {
+  width: 100%;
+  padding: 5px 7px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  font: inherit;
+}
+#modal select[size] { height: 180px; }
+#modal .sample {
+  margin-top: 12px;
+  padding: 10px;
+  min-height: 52px;
+  border: 1px dashed var(--ui-border);
+  border-radius: 4px;
+  background: var(--ui-bg);
+  overflow: hidden;
+  white-space: nowrap;
+}
+#modal .buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+#modal button {
+  min-width: 78px;
+  padding: 5px 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font: inherit;
+}
+#modal button.primary { background: var(--ui-accent); border-color: var(--ui-accent); color: #fff; }
+#modal .hint { margin-top: 6px; color: var(--ui-muted); font-size: 12px; }
+
+/* ---------- CodeMirror ---------- */
+.cm-editor.cm-focused { outline: none; }
+.cm-scroller { line-height: 1.6; }
+.cm-panels { background: var(--ui-chrome); color: var(--ui-text); }
+.cm-panels input, .cm-panels button { font: inherit; color: var(--ui-text); background: var(--ui-bg); border: 1px solid var(--ui-border); border-radius: 3px; }
+.cm-panels label { color: var(--ui-muted); }
+
+/* ---------- 另存 PDF：只留預覽內容 ---------- */
+@media print {
+  html, body { height: auto; overflow: visible; background: var(--mf-bg); }
+  #toolbar, #statusbar, #editor-pane, #splitter, #popup, #modal-backdrop { display: none !important; }
+  #main { display: block; }
+  #preview-pane { overflow: visible; }
+}

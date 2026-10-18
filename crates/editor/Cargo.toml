@@ -1,0 +1,37 @@
+[package]
+name = "markforge-editor"
+description = "MarkForge Editor — Markdown 編輯器（即時預覽、Mermaid、Word／Excel 貼上轉換）"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[[bin]]
+name = "MarkForgeEditor"
+path = "src/main.rs"
+
+[dependencies]
+markforge-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tao = "0.37"
+wry = "0.57"
+muda = "0.21"
+rfd = "0.17"
+webview2-com = "0.39"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png", "bmp"] }
+windows = { workspace = true, features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Com",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
+    "Win32_System_Ole",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+winresource = "0.1"

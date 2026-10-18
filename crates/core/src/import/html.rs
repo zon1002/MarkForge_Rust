@@ -327,11 +327,10 @@ impl<'s, 'r> Converter<'s, 'r> {
                 // Word 會在原始碼中硬換行；中文字之間的換行要直接拿掉，不能變成空格
                 let text = WHITESPACE.replace_all(&remove_cjk_line_wraps(raw), " ").into_owned();
                 let visible = text.chars().filter(|c| !c.is_whitespace()).count();
-                if visible > 0 {
-                    if let Some(size) = parent.size_pt {
+                if visible > 0
+                    && let Some(size) = parent.size_pt {
                         *self.inline_sizes.entry(size_key(size)).or_default() += visible;
                     }
-                }
                 return if parent.code { text } else { escape_inline(&text) };
             }
             Node::Element(_) => {}
@@ -822,11 +821,10 @@ fn escape_line_start(line: &str) -> String {
     if !digits.is_empty() {
         let rest = &trimmed[digits.len()..];
         let mut it = rest.chars();
-        if let (Some(d @ ('.' | ')')), Some(next)) = (it.next(), it.next()) {
-            if next.is_whitespace() {
+        if let (Some(d @ ('.' | ')')), Some(next)) = (it.next(), it.next())
+            && next.is_whitespace() {
                 return format!("{ws}{digits}\\{d}{}", &rest[1..]);
             }
-        }
         return line.to_string();
     }
     let mut chars = trimmed.chars();

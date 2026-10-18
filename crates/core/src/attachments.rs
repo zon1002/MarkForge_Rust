@@ -64,13 +64,11 @@ impl DocumentAssets {
     /// 登記既有檔案，回傳 Markdown 中要使用的相對路徑。已在文件資料夾內的檔案直接引用原檔。
     pub fn add_file(&mut self, source: &Path, preferred_name: Option<&str>) -> io::Result<String> {
         let full = absolute(source);
-        if let Some(doc_dir) = &self.document_dir {
-            if let Ok(rel) = full.strip_prefix(doc_dir) {
-                if !rel.as_os_str().is_empty() {
+        if let Some(doc_dir) = &self.document_dir
+            && let Ok(rel) = full.strip_prefix(doc_dir)
+                && !rel.as_os_str().is_empty() {
                     return Ok(to_markdown_path(rel));
                 }
-            }
-        }
 
         let name = sanitize_file_name(
             preferred_name.map(str::to_string).unwrap_or_else(|| {
@@ -126,11 +124,10 @@ impl DocumentAssets {
         if rel.is_empty() {
             return None;
         }
-        if let Some((_, path)) = self.pending.get(&rel.to_lowercase()) {
-            if path.is_file() {
+        if let Some((_, path)) = self.pending.get(&rel.to_lowercase())
+            && path.is_file() {
                 return Some(path.clone());
             }
-        }
         let doc_dir = self.document_dir.as_ref()?;
         let candidate = doc_dir.join(&rel);
         // 不允許以 ../ 跑出文件資料夾之外
@@ -268,13 +265,12 @@ fn percent_decode(s: &str) -> String {
     let mut out = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
-        if bytes[i] == b'%' {
-            if let (Some(h), Some(l)) = (hex(bytes.get(i + 1)), hex(bytes.get(i + 2))) {
+        if bytes[i] == b'%'
+            && let (Some(h), Some(l)) = (hex(bytes.get(i + 1)), hex(bytes.get(i + 2))) {
                 out.push(h * 16 + l);
                 i += 3;
                 continue;
             }
-        }
         out.push(bytes[i]);
         i += 1;
     }

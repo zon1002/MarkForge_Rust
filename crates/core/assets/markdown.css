@@ -130,3 +130,23 @@ html {
   .markdown-body { max-width: none; padding: 0; }
   .markdown-body pre.mermaid svg { transform: none !important; }
 }
+
+/* GitHub 提示框（> [!NOTE] 等） */
+.markdown-body .markdown-alert {
+  padding: .5em 1em;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid var(--mf-border);
+}
+.markdown-body .markdown-alert > :last-child { margin-bottom: 0; }
+.markdown-body .markdown-alert-title { display: flex; align-items: center; font-weight: 600; margin-bottom: 4px; }
+.markdown-body .markdown-alert-note { border-left-color: #4493f8; }
+.markdown-body .markdown-alert-note .markdown-alert-title { color: #4493f8; }
+.markdown-body .markdown-alert-tip { border-left-color: #3fb950; }
+.markdown-body .markdown-alert-tip .markdown-alert-title { color: #3fb950; }
+.markdown-body .markdown-alert-important { border-left-color: #ab7df8; }
+.markdown-body .markdown-alert-important .markdown-alert-title { color: #ab7df8; }
+.markdown-body .markdown-alert-warning { border-left-color: #d29922; }
+.markdown-body .markdown-alert-warning .markdown-alert-title { color: #d29922; }
+.markdown-body .markdown-alert-caution { border-left-color: #f85149; }
+.markdown-body .markdown-alert-caution .markdown-alert-title { color: #f85149; }
