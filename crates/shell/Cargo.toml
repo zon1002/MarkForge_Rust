@@ -11,9 +11,12 @@ serde_json = { workspace = true }
 wry = "0.57"
 webview2-com = "0.39"
 windows = { workspace = true, features = [
+    "Wdk_System_SystemServices",
     "Win32_Foundation",
     "Win32_Graphics_Gdi",
     "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_SystemInformation",
     "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",
 ] }

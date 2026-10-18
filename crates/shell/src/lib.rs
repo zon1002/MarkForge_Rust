@@ -1,6 +1,7 @@
 //! Editor 與 Viewer 共用、與 Windows 相關的小功能。
 
 pub mod fonts;
+pub mod theme;
 pub mod webview2;
 
 use std::path::PathBuf;

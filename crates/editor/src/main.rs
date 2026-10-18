@@ -20,7 +20,7 @@ use std::sync::{Arc, Mutex};
 use markforge_core::attachments::DocumentAssets;
 use markforge_core::{AssetMode, PageOptions, assets, page_html, render_body};
 use markforge_shell::webview2::{self, DROP_MESSAGE_PREFIX};
-use markforge_shell::{debug_log, fonts, local_data_dir, open_external, percent_decode};
+use markforge_shell::{debug_log, fonts, local_data_dir, open_external, percent_decode, theme};
 use muda::{MenuEvent, MenuTheme};
 use rfd::{FileDialog, MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
 use serde::Deserialize;
@@ -109,6 +109,7 @@ fn main() {
         let _ = menu.menu.init_for_hwnd(hwnd);
         let _ = menu.menu.set_theme_for_hwnd(hwnd, menu_theme(settings.dark));
     }
+    theme::set_popup_menu_theme(settings.dark);
     menu.icons.apply(windows::Win32::Foundation::HWND(hwnd as _));
     let menu_proxy = proxy.clone();
     MenuEvent::set_event_handler(Some(move |e: MenuEvent| {
@@ -533,6 +534,7 @@ impl App {
             unsafe {
                 let _ = self.menu.menu.set_theme_for_hwnd(window_hwnd(&self.window), menu_theme(dark));
             }
+            theme::set_popup_menu_theme(dark);
             let _ = self
                 .webview
                 .set_background_color(if dark { (13, 17, 23, 255) } else { (255, 255, 255, 255) });
