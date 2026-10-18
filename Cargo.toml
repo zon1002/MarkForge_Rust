@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/editor"]
+members = ["crates/core", "crates/shell", "crates/editor", "crates/viewer"]
 
 [workspace.package]
 version = "2.0.0"
@@ -9,6 +9,7 @@ rust-version = "1.92"
 
 [workspace.dependencies]
 markforge-core = { path = "crates/core" }
+markforge-shell = { path = "crates/shell" }
 comrak = { version = "0.56", default-features = false, features = ["shortcodes"] }
 regex = "1"
 serde = { version = "1", features = ["derive"] }

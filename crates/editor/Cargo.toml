@@ -12,13 +12,13 @@ path = "src/main.rs"
 
 [dependencies]
 markforge-core = { workspace = true }
+markforge-shell = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tao = "0.37"
 wry = "0.57"
 muda = "0.21"
 rfd = "0.17"
-webview2-com = "0.39"
 base64 = "0.22"
 image = { version = "0.25", default-features = false, features = ["png", "bmp"] }
 windows = { workspace = true, features = [

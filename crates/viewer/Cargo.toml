@@ -1,0 +1,24 @@
+[package]
+name = "markforge-viewer"
+description = "MarkForge Viewer — 唯讀 Markdown 檢視器，檔案被修改時自動重新載入"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[[bin]]
+name = "MarkForgeViewer"
+path = "src/main.rs"
+
+[dependencies]
+markforge-core = { workspace = true }
+markforge-shell = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tao = "0.37"
+wry = "0.57"
+rfd = "0.17"
+notify = "8"
+
+[build-dependencies]
+winresource = "0.1"

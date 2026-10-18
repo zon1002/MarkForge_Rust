@@ -151,7 +151,7 @@ pub fn paste(assets: &mut DocumentAssets, plain_only: bool) -> Paste {
 /// 瀏覽器可能是 data: URI——兩者都先存到暫存區，存檔時再放到文件旁。網址維持不變。
 fn resolve_pasted_image(src: &str, assets: &mut DocumentAssets) -> Option<String> {
     if let Some(rest) = src.strip_prefix("file:///").or_else(|| src.strip_prefix("file://")) {
-        let local = PathBuf::from(percent_decode(rest).replace('/', "\\"));
+        let local = PathBuf::from(markforge_shell::percent_decode(rest).replace('/', "\\"));
         return local.is_file().then(|| assets.add_transient_file(&local).ok()).flatten();
     }
     if let Some(rest) = src.strip_prefix("data:image/") {
@@ -171,19 +171,3 @@ fn resolve_pasted_image(src: &str, assets: &mut DocumentAssets) -> Option<String
     None
 }
 
-fn percent_decode(s: &str) -> String {
-    let b = s.as_bytes();
-    let mut out = Vec::with_capacity(b.len());
-    let mut i = 0;
-    while i < b.len() {
-        if b[i] == b'%' && i + 2 < b.len()
-            && let Ok(v) = u8::from_str_radix(&s[i + 1..i + 3], 16) {
-                out.push(v);
-                i += 3;
-                continue;
-            }
-        out.push(b[i]);
-        i += 1;
-    }
-    String::from_utf8_lossy(&out).into_owned()
-}

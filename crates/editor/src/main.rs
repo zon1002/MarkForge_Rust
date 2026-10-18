@@ -8,11 +8,9 @@
 #![windows_subsystem = "windows"]
 
 mod clipboard;
-mod fonts;
 mod insert;
 mod menu;
 mod settings;
-mod webview2;
 
 use std::borrow::Cow;
 use std::path::{Path, PathBuf};
@@ -20,6 +18,8 @@ use std::sync::{Arc, Mutex};
 
 use markforge_core::attachments::DocumentAssets;
 use markforge_core::{AssetMode, PageOptions, assets, page_html, render_body};
+use markforge_shell::webview2::{self, DROP_MESSAGE_PREFIX};
+use markforge_shell::{debug_log, fonts, local_data_dir, open_external, percent_decode};
 use muda::{MenuEvent, MenuTheme};
 use rfd::{FileDialog, MessageButtons, MessageDialog, MessageDialogResult, MessageLevel};
 use serde::Deserialize;
@@ -135,7 +135,10 @@ fn main() {
         .build(&window)
         .expect("無法初始化 WebView2（請確認已安裝 Microsoft Edge WebView2 Runtime）");
 
-    match webview2::install_file_drop_hook(&webview, proxy.clone()) {
+    let drop_proxy = proxy.clone();
+    match webview2::install_file_drop_hook(&webview, move |d| {
+        let _ = drop_proxy.send_event(UserEvent::FilesDropped { paths: d.paths, x: d.x, y: d.y, target: d.target });
+    }) {
         Ok(()) => debug_log("file drop hook installed"),
         Err(e) => debug_log(&format!("file drop hook failed: {e}")),
     }
@@ -232,7 +235,7 @@ impl App {
     fn handle_ipc(&mut self, body: &str) -> bool {
         debug_log(&body.chars().take(160).collect::<String>());
         // 拖入檔案的訊息也會經過 wry 的 IPC（附加物件只有 webview2::install_file_drop_hook 拿得到），這裡略過
-        if body.starts_with(r#"{"type":"drop""#) {
+        if body.starts_with(DROP_MESSAGE_PREFIX) {
             return false;
         }
         let msg: Ipc = match serde_json::from_str(body) {
@@ -432,7 +435,10 @@ impl App {
             self.run_js("app.pdfDone()");
             return;
         };
-        if let Err(e) = webview2::print_to_pdf(&self.webview, &path, self.proxy.clone()) {
+        let proxy = self.proxy.clone();
+        if let Err(e) = webview2::print_to_pdf(&self.webview, &path, move |r| {
+            let _ = proxy.send_event(UserEvent::PdfDone(r));
+        }) {
             self.run_js("app.pdfDone()");
             self.warn("匯出失敗", &format!("無法匯出 PDF：\n{e}"));
         }
@@ -610,15 +616,6 @@ impl App {
     }
 }
 
-/// 設定環境變數 MARKFORGE_DEBUG_LOG=檔案路徑 時，把 IPC 與貼上判斷寫入該檔（診斷用）。
-pub(crate) fn debug_log(line: &str) {
-    if let Some(path) = std::env::var_os("MARKFORGE_DEBUG_LOG") {
-        use std::io::Write;
-        if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(path) {
-            let _ = writeln!(f, "{line}");
-        }
-    }
-}
 
 fn js<T: serde::Serialize + ?Sized>(value: &T) -> String {
     serde_json::to_string(value).unwrap_or_else(|_| "null".into())
@@ -645,37 +642,5 @@ fn window_hwnd(window: &Window) -> isize {
     window.hwnd()
 }
 
-fn local_data_dir() -> Option<PathBuf> {
-    std::env::var_os("LOCALAPPDATA").map(|d| PathBuf::from(d).join("MarkForge"))
-}
 
-/// 以系統預設程式開啟網址（只允許 http、https、mailto）。
-fn open_external(url: &str) {
-    let lower = url.to_ascii_lowercase();
-    if !(lower.starts_with("http://") || lower.starts_with("https://") || lower.starts_with("mailto:")) {
-        return;
-    }
-    use windows::Win32::UI::Shell::ShellExecuteW;
-    use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
-    use windows::core::{HSTRING, w};
-    unsafe {
-        ShellExecuteW(None, w!("open"), &HSTRING::from(url), None, None, SW_SHOWNORMAL);
-    }
-}
 
-fn percent_decode(s: &str) -> String {
-    let b = s.as_bytes();
-    let mut out = Vec::with_capacity(b.len());
-    let mut i = 0;
-    while i < b.len() {
-        if b[i] == b'%' && i + 2 < b.len()
-            && let Ok(v) = u8::from_str_radix(&s[i + 1..i + 3], 16) {
-                out.push(v);
-                i += 3;
-                continue;
-            }
-        out.push(b[i]);
-        i += 1;
-    }
-    String::from_utf8_lossy(&out).into_owned()
-}

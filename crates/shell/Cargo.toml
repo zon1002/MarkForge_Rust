@@ -1,0 +1,19 @@
+[package]
+name = "markforge-shell"
+description = "MarkForge Editor／Viewer 共用的 Windows 整合：WebView2 擴充（拖入檔案路徑、另存 PDF）、字型清單、外部連結、診斷記錄"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+wry = "0.57"
+webview2-com = "0.39"
+windows = { workspace = true, features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Com",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
