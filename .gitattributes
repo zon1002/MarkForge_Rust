@@ -1,0 +1,4 @@
+# 測試樣本要逐位元組保存（例如 Word 剪貼簿的原始 CF_HTML），不做換行轉換
+crates/core/tests/fixtures/** binary
+*.ico binary
+*.png binary
