@@ -77,21 +77,36 @@ pub fn page_html(body_html: &str, opts: &PageOptions, mode: AssetMode) -> String
         });
     }
 
+    // 選項為 JSON（同時也是合法的 JS 物件字面值）
     let js_opts = format!(
-        "{{ dark: {}, docBase: {}, absBase: {} }}",
+        "{{\"dark\":{},\"docBase\":{},\"absBase\":{}}}",
         opts.dark,
-        js_string_or_null(opts.doc_base.as_deref()),
-        js_string_or_null(opts.abs_base.as_deref())
+        json_string_or_null(opts.doc_base.as_deref()),
+        json_string_or_null(opts.abs_base.as_deref())
     );
 
+    // Served：啟動腳本是 /assets/boot.js、選項放在 data-mf-options，頁面可套用禁止行內腳本的
+    // Content-Security-Policy（檔案總管預覽）。Inline：單一檔案，啟動腳本只能內嵌。
+    let (options_attr, boot) = match mode {
+        AssetMode::Served => (
+            format!(" data-mf-options=\"{}\"", escape_html(&js_opts)),
+            format!("<script src=\"/assets/{}\"></script>\n", assets::BOOT_JS),
+        ),
+        AssetMode::Inline => (
+            String::new(),
+            format!(
+                "<script>\nMarkForgePreview.init({js_opts});\n\
+                 window.mfReady = MarkForgePreview.enhance(document.getElementById('content'), {js_opts});\n</script>\n"
+            ),
+        ),
+    };
+
     format!(
-        "<!doctype html>\n<html data-theme=\"{theme}\" style='{vars}'>\n<head>\n<meta charset=\"utf-8\">\n\
+        "<!doctype html>\n<html data-theme=\"{theme}\"{options_attr} style=\"{vars}\">\n<head>\n<meta charset=\"utf-8\">\n\
          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>{title}</title>\n\
          <style>html, body {{ margin: 0; background: var(--mf-bg); }}</style>\n{head}</head>\n<body>\n\
-         <article id=\"content\" class=\"markdown-body\">\n{body_html}</article>\n\
-         <script>\nMarkForgePreview.init({js_opts});\nwindow.mfReady = MarkForgePreview.enhance(document.getElementById('content'), {js_opts});\n</script>\n\
-         </body>\n</html>\n",
-        vars = css_variables(opts).replace('\'', ""),
+         <article id=\"content\" class=\"markdown-body\">\n{body_html}</article>\n{boot}</body>\n</html>\n",
+        vars = escape_html(&css_variables(opts)),
         title = escape_html(&opts.title),
     )
 }
@@ -101,20 +116,22 @@ fn inline_script(js: &str) -> String {
     js.replace("</script", "<\\/script").replace("</SCRIPT", "<\\/SCRIPT")
 }
 
-fn js_string_or_null(value: Option<&str>) -> String {
+fn json_string_or_null(value: Option<&str>) -> String {
     match value {
         None => "null".to_string(),
         Some(v) => {
-            let mut s = String::from("'");
+            let mut s = String::from("\"");
             for ch in v.chars() {
                 match ch {
-                    '\'' => s.push_str("\\'"),
+                    '"' => s.push_str("\\\""),
                     '\\' => s.push_str("\\\\"),
+                    // 也避免 </script> 提早結束內嵌腳本
                     '<' => s.push_str("\\u003c"),
-                    _ => s.push(ch),
+                    c if (c as u32) < 0x20 => s.push_str(&format!("\\u{:04x}", c as u32)),
+                    c => s.push(c),
                 }
             }
-            s.push('\'');
+            s.push('"');
             s
         }
     }
@@ -131,7 +148,9 @@ mod tests {
         assert!(html.contains("<html data-theme=\"dark\""));
         assert!(html.contains("src=\"/assets/mermaid.min.js\""));
         assert!(html.contains("href=\"/assets/github-dark.min.css\""));
-        assert!(html.contains("docBase: '/doc/'"));
+        assert!(html.contains("data-mf-options=\"{&quot;dark&quot;:true,&quot;docBase&quot;:&quot;/doc/&quot;"), "{html}");
+        assert!(html.contains("<script src=\"/assets/boot.js\"></script>"));
+        assert!(!html.contains("<script>"), "served pages must not contain inline scripts (CSP)");
         assert!(html.len() < 20_000);
     }
 
@@ -140,7 +159,7 @@ mod tests {
         let opts = PageOptions { dark: false, doc_base: None, abs_base: None, ..PageOptions::default() };
         let html = page_html(&render_body("![a](pic.png)"), &opts, AssetMode::Inline);
         assert!(!html.contains("/assets/"));
-        assert!(html.contains("docBase: null"));
+        assert!(html.contains("\"docBase\":null"));
         assert!(html.contains("src=\"pic.png\""));
         assert!(html.len() > 3_000_000, "mermaid.js should be inlined");
         // 內嵌腳本不可出現會提早結束 <script> 的字串（只有我們自己的結束標籤）

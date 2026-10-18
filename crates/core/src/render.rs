@@ -68,7 +68,7 @@ fn convert_mermaid_blocks<'a>(root: &'a AstNode<'a>) {
     }
 }
 
-pub(crate) fn escape_html(text: &str) -> String {
+pub fn escape_html(text: &str) -> String {
     let mut out = String::with_capacity(text.len() + 16);
     for ch in text.chars() {
         match ch {

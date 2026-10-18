@@ -1491,6 +1491,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "markforge-preview-handler"
+version = "2.0.0"
+dependencies = [
+ "tao",
+ "windows",
+ "windows-core",
+]
+
+[[package]]
+name = "markforge-preview-host"
+version = "2.0.0"
+dependencies = [
+ "markforge-core",
+ "markforge-shell",
+ "raw-window-handle",
+ "windows",
+ "winresource",
+ "wry",
+]
+
+[[package]]
 name = "markforge-shell"
 version = "2.0.0"
 dependencies = [

@@ -10,6 +10,8 @@ Windows 桌面 Markdown 編輯器／檢視器，以 Rust 改寫自 C#／.NET 8 �
 |-------|------|
 | `crates/editor`（MarkForgeEditor.exe） | 編輯器：tao 視窗 + muda 原生選單 + wry（WebView2）；前端 CodeMirror 6（`crates/editor/web`） |
 | `crates/viewer`（MarkForgeViewer.exe） | 檢視器：唯讀顯示，檔案被修改時自動重新載入（notify） |
+| `crates/preview-handler`（MarkForgePreview.dll） | 檔案總管預覽處理常式（IPreviewHandler COM，純 Rust）；`preview_test` 不經登錄依檔案總管的呼叫順序測試 |
+| `crates/preview-host`（MarkForgePreviewHost.exe） | 預覽窗格內的渲染程式：Win32 子視窗 + WebView2，嚴格 CSP |
 | `crates/shell`（markforge-shell） | Editor／Viewer 共用的 Windows 整合：WebView2 擴充（拖入檔案路徑、另存 PDF）、字型清單、外部連結、診斷記錄 |
 | `crates/core`（markforge-core） | Markdown 渲染（comrak）、HTML 頁面範本、離線資源（highlight.js、mermaid.js、CSS、預覽腳本）、貼上／拖入轉換（Word／LibreOffice／Google 文件 HTML、表格、試算表） |
 

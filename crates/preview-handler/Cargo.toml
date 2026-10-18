@@ -1,0 +1,40 @@
+[package]
+name = "markforge-preview-handler"
+description = "MarkForge 檔案總管預覽處理常式（IPreviewHandler COM 伺服器）"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+# 輸出檔名須為 MarkForgePreview.dll（安裝程式以此名稱登錄 COM 伺服器）
+[lib]
+name = "MarkForgePreview"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# #[implement] 產生的程式碼會引用 ::windows_core
+windows-core = "0.62"
+# 只有測試程式 preview_test 使用（不會連結進 DLL）
+tao = "0.37"
+windows = { workspace = true, features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Security",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Ole",
+    "Win32_System_Registry",
+    "Win32_System_SystemServices",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_Shell_PropertiesSystem",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+# 不經登錄、直接在本程序建立 COM 物件，依檔案總管的呼叫順序測試（見 src/bin/preview_test.rs）
+[dev-dependencies]
+
+[[bin]]
+name = "preview_test"
+path = "src/bin/preview_test.rs"

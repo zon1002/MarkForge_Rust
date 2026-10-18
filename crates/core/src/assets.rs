@@ -15,6 +15,7 @@ macro_rules! asset {
 pub const HIGHLIGHT_JS: &str = "highlight.min.js";
 pub const MERMAID_JS: &str = "mermaid.min.js";
 pub const PREVIEW_JS: &str = "preview.js";
+pub const BOOT_JS: &str = "boot.js";
 pub const MARKDOWN_CSS: &str = "markdown.css";
 pub const HLJS_LIGHT_CSS: &str = "github.min.css";
 pub const HLJS_DARK_CSS: &str = "github-dark.min.css";
@@ -25,6 +26,7 @@ pub fn get(name: &str) -> Option<Asset> {
         HIGHLIGHT_JS => asset!("highlight.min.js", "text/javascript"),
         MERMAID_JS => asset!("mermaid.min.js", "text/javascript"),
         PREVIEW_JS => asset!("preview.js", "text/javascript"),
+        BOOT_JS => asset!("boot.js", "text/javascript"),
         MARKDOWN_CSS => asset!("markdown.css", "text/css"),
         HLJS_LIGHT_CSS => asset!("github.min.css", "text/css"),
         HLJS_DARK_CSS => asset!("github-dark.min.css", "text/css"),
@@ -72,7 +74,7 @@ mod tests {
 
     #[test]
     fn all_named_assets_exist() {
-        for name in [HIGHLIGHT_JS, MERMAID_JS, PREVIEW_JS, MARKDOWN_CSS, HLJS_LIGHT_CSS, HLJS_DARK_CSS] {
+        for name in [HIGHLIGHT_JS, MERMAID_JS, PREVIEW_JS, BOOT_JS, MARKDOWN_CSS, HLJS_LIGHT_CSS, HLJS_DARK_CSS] {
             assert!(!text(name).is_empty(), "{name}");
         }
         assert!(get("nope.js").is_none());

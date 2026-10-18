@@ -1,0 +1,27 @@
+[package]
+name = "markforge-preview-host"
+description = "MarkForge 檔案總管預覽窗格的渲染程式（由 MarkForgePreview.dll 啟動，視窗建立在預覽窗格內）"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+build = "build.rs"
+
+[[bin]]
+name = "MarkForgePreviewHost"
+path = "src/main.rs"
+
+[dependencies]
+markforge-core = { workspace = true }
+markforge-shell = { workspace = true }
+raw-window-handle = "0.6"
+wry = "0.57"
+windows = { workspace = true, features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+winresource = "0.1"
