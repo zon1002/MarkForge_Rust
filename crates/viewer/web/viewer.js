@@ -71,15 +71,15 @@
   }
 
   function buildToolbar() {
-    const widthBtn = button('layout-split', '寬度', '調整閱讀版面寬度', (e) => showPopup(widthItems(), widthBtn, e));
+    const widthBtn = button('view-width', '寬度', '調整閱讀版面寬度', (e) => showPopup(widthItems(), widthBtn, e));
     widthBtn.insertAdjacentHTML('beforeend', '<span class="caret">▼</span>');
     $('#toolbar').append(
-      button('folder2-open', '開啟...', '開啟 Markdown 檔案 (Ctrl+O)', () => ipc({ cmd: 'open' })),
-      button('arrow-clockwise', '重新整理', '重新載入 (F5)', () => ipc({ cmd: 'reload' })),
-      button('moon-stars', '深色/淺色', '切換主題', () => ipc({ cmd: 'settings', patch: { dark: !state.settings.dark } })),
-      button('fonts', '字型...', '選擇預覽字型與大小', fontDialog),
+      button('file-open', '開啟...', '開啟 Markdown 檔案 (Ctrl+O)', () => ipc({ cmd: 'open' })),
+      button('view-refresh', '重新整理', '重新載入 (F5)', () => ipc({ cmd: 'reload' })),
+      button('view-theme', '深色/淺色', '切換主題', () => ipc({ cmd: 'settings', patch: { dark: !state.settings.dark } })),
+      button('view-preview-font', '字型...', '選擇預覽字型與大小', fontDialog),
       widthBtn,
-      button('filetype-pdf', '另存PDF...', '將目前內容另存為 PDF', exportPdf),
+      button('export-pdf', '另存PDF...', '將目前內容另存為 PDF', exportPdf),
     );
   }
 

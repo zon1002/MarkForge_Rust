@@ -566,38 +566,38 @@
     const sep = () => { const s = document.createElement('span'); s.className = 'tb-sep'; return s; };
     const cmd = (name, arg) => () => runCommand(name, arg);
     tb.append(
-      makeButton('type-bold', '粗體', '粗體 (Ctrl+B)', cmd('fmt.bold')),
-      makeButton('type-italic', '斜體', '斜體 (Ctrl+I)', cmd('fmt.italic')),
-      makeButton('type-strikethrough', '刪除線', '刪除線', cmd('fmt.strike')),
+      makeButton('fmt-bold', '粗體', '粗體 (Ctrl+B)', cmd('fmt.bold')),
+      makeButton('fmt-italic', '斜體', '斜體 (Ctrl+I)', cmd('fmt.italic')),
+      makeButton('fmt-strike', '刪除線', '刪除線', cmd('fmt.strike')),
       sep(),
-      dropdownButton('type-h1', '標題', '標題 1～6', [1, 2, 3, 4, 5, 6].map((n) => ({ label: '標題 ' + n, run: cmd('fmt.heading', n) }))),
+      dropdownButton('fmt-heading', '標題', '標題 1～6', [1, 2, 3, 4, 5, 6].map((n) => ({ label: '標題 ' + n, run: cmd('fmt.heading', n) }))),
       sep(),
-      makeButton('blockquote-left', '引用', '引用區塊', cmd('fmt.quote')),
-      makeButton('list-ul', '項目清單', '項目符號清單', cmd('fmt.ul')),
-      makeButton('list-ol', '編號清單', '編號清單', cmd('fmt.ol')),
-      dropdownButton('list-check', '工作清單', '工作清單（核取方塊）— 箭頭可選擇打勾／打叉／三角形／驚嘆號', [
-        { label: '打勾', icon: 'check-circle-fill', color: '#16a34a', run: cmd('fmt.task', 'x') },
-        { label: '打叉', icon: 'x-circle-fill', color: '#dc2626', run: cmd('fmt.task', '✗') },
-        { label: '三角形', icon: 'triangle-fill', color: '#f59e0b', run: cmd('fmt.task', '▲') },
-        { label: '驚嘆號', icon: 'exclamation-circle-fill', color: '#2563eb', run: cmd('fmt.task', '!') },
+      makeButton('fmt-quote', '引用', '引用區塊', cmd('fmt.quote')),
+      makeButton('fmt-ul', '項目清單', '項目符號清單', cmd('fmt.ul')),
+      makeButton('fmt-ol', '編號清單', '編號清單', cmd('fmt.ol')),
+      dropdownButton('fmt-task', '工作清單', '工作清單（核取方塊）— 箭頭可選擇打勾／打叉／三角形／驚嘆號', [
+        { label: '打勾', icon: 'task-done', run: cmd('fmt.task', 'x') },
+        { label: '打叉', icon: 'task-cross', run: cmd('fmt.task', '✗') },
+        { label: '三角形', icon: 'task-triangle', run: cmd('fmt.task', '▲') },
+        { label: '驚嘆號', icon: 'task-exclaim', run: cmd('fmt.task', '!') },
       ], cmd('fmt.task')),
       sep(),
-      makeButton('code-slash', '行內程式碼', '行內程式碼', cmd('fmt.inlineCode')),
-      makeButton('code-square', '程式碼區塊', '程式碼區塊', cmd('fmt.codeBlock')),
+      makeButton('fmt-code-inline', '行內程式碼', '行內程式碼', cmd('fmt.inlineCode')),
+      makeButton('fmt-code-block', '程式碼區塊', '程式碼區塊', cmd('fmt.codeBlock')),
       sep(),
-      makeButton('link-45deg', '連結', '插入連結 (Ctrl+K)', cmd('fmt.link')),
-      dropdownButton('image', '圖片', '選擇圖片檔案插入（存檔時自動複製到 .md 所在資料夾）；也可直接拖入或貼上圖片', [
-        { label: '選擇圖片檔案...', run: cmd('insert.image') },
-        { label: '插入圖片語法範本', run: cmd('fmt.imageTemplate') },
+      makeButton('fmt-link', '連結', '插入連結 (Ctrl+K)', cmd('fmt.link')),
+      dropdownButton('insert-image', '圖片', '選擇圖片檔案插入（存檔時自動複製到 .md 所在資料夾）；也可直接拖入或貼上圖片', [
+        { label: '選擇圖片檔案...', icon: 'file-open', run: cmd('insert.image') },
+        { label: '插入圖片語法範本', icon: 'insert-image', run: cmd('fmt.imageTemplate') },
       ], cmd('insert.image')),
-      dropdownButton('table', '表格', '插入表格範本；也可直接拖入 Excel／CSV 檔案，或貼上複製的儲存格', [
-        { label: '插入表格範本', run: cmd('fmt.table') },
-        { label: '從 Excel／CSV／ODS 檔案匯入...', run: cmd('insert.table') },
+      dropdownButton('insert-table', '表格', '插入表格範本；也可直接拖入 Excel／CSV 檔案，或貼上複製的儲存格', [
+        { label: '插入表格範本', icon: 'insert-table', run: cmd('fmt.table') },
+        { label: '從 Excel／CSV／ODS 檔案匯入...', icon: 'file-open', run: cmd('insert.table') },
       ], cmd('fmt.table')),
-      makeButton('dash-lg', '分隔線', '插入水平分隔線', cmd('fmt.hr')),
+      makeButton('fmt-hr', '分隔線', '插入水平分隔線', cmd('fmt.hr')),
       sep(),
-      makeButton('arrow-counterclockwise', '復原', '復原 (Ctrl+Z)', cmd('edit.undo')),
-      makeButton('arrow-clockwise', '重做', '重做 (Ctrl+Y)', cmd('edit.redo')),
+      makeButton('edit-undo', '復原', '復原 (Ctrl+Z)', cmd('edit.undo')),
+      makeButton('edit-redo', '重做', '重做 (Ctrl+Y)', cmd('edit.redo')),
     );
   }
 
@@ -612,7 +612,7 @@
       if (it.sep) { const s = document.createElement('div'); s.className = 'pm-sep'; popup.append(s); continue; }
       const row = document.createElement('div');
       row.className = 'pm-item' + (it.disabled ? ' disabled' : '');
-      const iconHtml = it.icon ? icon(it.icon).replace('<svg', '<svg style="fill:' + (it.color || 'var(--ui-icon)') + '"') : '';
+      const iconHtml = it.icon ? icon(it.icon) : '';
       row.innerHTML = '<span class="pm-icon">' + iconHtml + '</span><span>' + it.label + '</span>' +
         (it.key ? '<span class="pm-key">' + it.key + '</span>' : '');
       row.addEventListener('mousedown', (e) => e.preventDefault());
@@ -640,15 +640,15 @@
     e.preventDefault();
     const hasSelection = !view.state.selection.main.empty;
     showPopup([
-      { label: '復原', key: 'Ctrl+Z', icon: 'arrow-counterclockwise', run: () => runCommand('edit.undo') },
-      { label: '重做', key: 'Ctrl+Y', icon: 'arrow-clockwise', run: () => runCommand('edit.redo') },
+      { label: '復原', key: 'Ctrl+Z', icon: 'edit-undo', run: () => runCommand('edit.undo') },
+      { label: '重做', key: 'Ctrl+Y', icon: 'edit-redo', run: () => runCommand('edit.redo') },
       { sep: true },
-      { label: '剪下', key: 'Ctrl+X', icon: 'scissors', disabled: !hasSelection, run: () => runCommand('edit.cut') },
-      { label: '複製', key: 'Ctrl+C', icon: 'copy', disabled: !hasSelection, run: () => runCommand('edit.copy') },
-      { label: '貼上', key: 'Ctrl+V', icon: 'clipboard', run: () => runCommand('edit.paste') },
-      { label: '貼上為純文字', key: 'Ctrl+Shift+V', icon: 'clipboard', run: () => runCommand('edit.pastePlain') },
+      { label: '剪下', key: 'Ctrl+X', icon: 'edit-cut', disabled: !hasSelection, run: () => runCommand('edit.cut') },
+      { label: '複製', key: 'Ctrl+C', icon: 'edit-copy', disabled: !hasSelection, run: () => runCommand('edit.copy') },
+      { label: '貼上', key: 'Ctrl+V', icon: 'edit-paste', run: () => runCommand('edit.paste') },
+      { label: '貼上為純文字', key: 'Ctrl+Shift+V', icon: 'edit-paste-plain', run: () => runCommand('edit.pastePlain') },
       { sep: true },
-      { label: '全選', key: 'Ctrl+A', run: () => runCommand('edit.selectAll') },
+      { label: '全選', key: 'Ctrl+A', icon: 'edit-select-all', run: () => runCommand('edit.selectAll') },
     ], null, e);
     return true;
   }
@@ -656,7 +656,7 @@
   previewPane.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     const hasSelection = !!String(window.getSelection() || '');
-    showPopup([{ label: '複製', key: 'Ctrl+C', icon: 'copy', disabled: !hasSelection, run: () => document.execCommand('copy') }], null, e);
+    showPopup([{ label: '複製', key: 'Ctrl+C', icon: 'edit-copy', disabled: !hasSelection, run: () => document.execCommand('copy') }], null, e);
   });
 
   // ============================== 對話框 ==============================

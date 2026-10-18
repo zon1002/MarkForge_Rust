@@ -7,10 +7,13 @@
 use muda::accelerator::Accelerator;
 use muda::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
 
+use crate::menu_icons::MenuIcons;
 use crate::settings::{Settings, WIDTH_PRESETS};
 
 pub struct AppMenu {
     pub menu: Menu,
+    /// 選單文字 → 彩色圖示（menu_icons.rs 依視窗 DPI 套用）
+    pub icons: MenuIcons,
     pub show_editor: CheckMenuItem,
     pub show_preview: CheckMenuItem,
     pub dark: CheckMenuItem,
@@ -18,9 +21,11 @@ pub struct AppMenu {
     pub width_custom: CheckMenuItem,
 }
 
-fn item(id: &str, text: &str, shortcut: Option<&str>) -> MenuItem {
+/// 建立選單項目並記下它的圖示（`icon` 是 crates/core/icons 下的檔名）。
+fn item(icons: &mut MenuIcons, id: &str, text: &str, shortcut: Option<&str>, icon: &'static str) -> MenuItem {
     // 只用來顯示：解析失敗就不顯示快捷鍵
     let accel = shortcut.and_then(|s| s.parse::<Accelerator>().ok());
+    icons.register(text, icon);
     MenuItem::with_id(id, text, true, accel)
 }
 
@@ -31,20 +36,22 @@ fn check(id: &str, text: &str, checked: bool) -> CheckMenuItem {
 impl AppMenu {
     pub fn build(settings: &Settings) -> muda::Result<Self> {
         let sep = PredefinedMenuItem::separator;
+        let mut icons = MenuIcons::default();
+        let ic = &mut icons;
 
         let file = Submenu::with_items(
             "檔案(&F)",
             true,
             &[
-                &item("file.new", "新增(&N)", Some("Ctrl+N")),
-                &item("file.open", "開啟(&O)...", Some("Ctrl+O")),
-                &item("file.save", "儲存(&S)", Some("Ctrl+S")),
-                &item("file.saveAs", "另存新檔(&A)...", Some("Ctrl+Shift+S")),
+                &item(ic, "file.new", "新增(&N)", Some("Ctrl+N"), "file-new"),
+                &item(ic, "file.open", "開啟(&O)...", Some("Ctrl+O"), "file-open"),
+                &item(ic, "file.save", "儲存(&S)", Some("Ctrl+S"), "file-save"),
+                &item(ic, "file.saveAs", "另存新檔(&A)...", Some("Ctrl+Shift+S"), "file-save-as"),
                 &sep(),
-                &item("file.exportHtml", "匯出為 HTML(&E)...", None),
-                &item("file.exportPdf", "另存為 PDF(&P)...", None),
+                &item(ic, "file.exportHtml", "匯出為 HTML(&E)...", None, "export-html"),
+                &item(ic, "file.exportPdf", "另存為 PDF(&P)...", None, "export-pdf"),
                 &sep(),
-                &item("app.exit", "結束(&X)", None),
+                &item(ic, "app.exit", "結束(&X)", None, "app-exit"),
             ],
         )?;
 
@@ -52,20 +59,20 @@ impl AppMenu {
             "編輯(&E)",
             true,
             &[
-                &item("edit.undo", "復原(&U)", Some("Ctrl+Z")),
-                &item("edit.redo", "重做(&R)", Some("Ctrl+Y")),
+                &item(ic, "edit.undo", "復原(&U)", Some("Ctrl+Z"), "edit-undo"),
+                &item(ic, "edit.redo", "重做(&R)", Some("Ctrl+Y"), "edit-redo"),
                 &sep(),
-                &item("edit.cut", "剪下(&T)", Some("Ctrl+X")),
-                &item("edit.copy", "複製(&C)", Some("Ctrl+C")),
-                &item("edit.paste", "貼上(&P)", Some("Ctrl+V")),
-                &item("edit.pastePlain", "貼上為純文字(&L)", Some("Ctrl+Shift+V")),
-                &item("edit.selectAll", "全選(&A)", Some("Ctrl+A")),
+                &item(ic, "edit.cut", "剪下(&T)", Some("Ctrl+X"), "edit-cut"),
+                &item(ic, "edit.copy", "複製(&C)", Some("Ctrl+C"), "edit-copy"),
+                &item(ic, "edit.paste", "貼上(&P)", Some("Ctrl+V"), "edit-paste"),
+                &item(ic, "edit.pastePlain", "貼上為純文字(&L)", Some("Ctrl+Shift+V"), "edit-paste-plain"),
+                &item(ic, "edit.selectAll", "全選(&A)", Some("Ctrl+A"), "edit-select-all"),
                 &sep(),
-                &item("edit.find", "尋找／取代(&F)...", Some("Ctrl+F")),
+                &item(ic, "edit.find", "尋找／取代(&F)...", Some("Ctrl+F"), "edit-find"),
                 &sep(),
-                &item("fmt.bold", "粗體(&B)", Some("Ctrl+B")),
-                &item("fmt.italic", "斜體(&I)", Some("Ctrl+I")),
-                &item("fmt.link", "插入連結(&K)", Some("Ctrl+K")),
+                &item(ic, "fmt.bold", "粗體(&B)", Some("Ctrl+B"), "fmt-bold"),
+                &item(ic, "fmt.italic", "斜體(&I)", Some("Ctrl+I"), "fmt-italic"),
+                &item(ic, "fmt.link", "插入連結(&K)", Some("Ctrl+K"), "fmt-link"),
             ],
         )?;
 
@@ -73,10 +80,10 @@ impl AppMenu {
             "插入(&I)",
             true,
             &[
-                &item("insert.image", "圖片檔案(&I)...", None),
-                &item("insert.table", "表格檔案 (Excel／CSV／ODS)(&T)...", None),
-                &item("insert.mermaid", "Mermaid 圖表檔案(&M)...", None),
-                &item("insert.attachment", "附件檔案(&A)...", None),
+                &item(ic, "insert.image", "圖片檔案(&I)...", None, "insert-image"),
+                &item(ic, "insert.table", "表格檔案 (Excel／CSV／ODS)(&T)...", None, "insert-table"),
+                &item(ic, "insert.mermaid", "Mermaid 圖表檔案(&M)...", None, "insert-mermaid"),
+                &item(ic, "insert.attachment", "附件檔案(&A)...", None, "insert-attachment"),
             ],
         )?;
 
@@ -90,6 +97,7 @@ impl AppMenu {
             .collect();
         let width_custom = check("view.widthCustom", "自訂寬度(&C)...", false);
         let width_menu = Submenu::new("預覽寬度(&W)", true);
+        ic.register("預覽寬度(&W)", "view-width");
         for (_, w) in &widths {
             width_menu.append(w)?;
         }
@@ -105,16 +113,16 @@ impl AppMenu {
                 &show_editor,
                 &show_preview,
                 &sep(),
-                &item("view.editorFont", "編輯器字型(&F)...", None),
-                &item("view.previewFont", "預覽字型(&G)...", None),
+                &item(ic, "view.editorFont", "編輯器字型(&F)...", None, "view-editor-font"),
+                &item(ic, "view.previewFont", "預覽字型(&G)...", None, "view-preview-font"),
                 &width_menu,
             ],
         )?;
 
-        let help = Submenu::with_items("說明(&H)", true, &[&item("help.about", "關於 MarkForge(&A)", None)])?;
+        let help = Submenu::with_items("說明(&H)", true, &[&item(ic, "help.about", "關於 MarkForge(&A)", None, "help-about")])?;
 
         let menu = Menu::with_items(&[&file, &edit, &insert, &view, &help])?;
-        let me = AppMenu { menu, show_editor, show_preview, dark, widths, width_custom };
+        let me = AppMenu { menu, icons, show_editor, show_preview, dark, widths, width_custom };
         me.sync(settings);
         Ok(me)
     }

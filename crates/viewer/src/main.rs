@@ -219,7 +219,6 @@ fn serve(request: &Request<Vec<u8>>, current: &Arc<Mutex<Option<PathBuf>>>) -> R
         "/viewer.css" => Some((web_file!("../web/viewer.css").into(), "text/css")),
         "/viewer.js" => Some((web_file!("../web/viewer.js").into(), "text/javascript")),
         // 工具列圖示與 Editor 共用同一份
-        "/icons.js" => Some((web_file!("../../editor/web/icons.js").into(), "text/javascript")),
         _ => {
             if let Some(name) = path.strip_prefix("/assets/") {
                 assets::get(name).map(|a| (Cow::Borrowed(a.bytes), a.mime))

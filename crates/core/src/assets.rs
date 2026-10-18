@@ -19,6 +19,8 @@ pub const BOOT_JS: &str = "boot.js";
 pub const MARKDOWN_CSS: &str = "markdown.css";
 pub const HLJS_LIGHT_CSS: &str = "github.min.css";
 pub const HLJS_DARK_CSS: &str = "github-dark.min.css";
+/// 彩色圖示（`window.ICONS`），由 build.rs 自 `icons/*.svg` 產生
+pub const COLOR_ICONS_JS: &str = "color-icons.js";
 
 /// 依檔名取得資源；不認得的名稱回傳 `None`。
 pub fn get(name: &str) -> Option<Asset> {
@@ -30,6 +32,10 @@ pub fn get(name: &str) -> Option<Asset> {
         MARKDOWN_CSS => asset!("markdown.css", "text/css"),
         HLJS_LIGHT_CSS => asset!("github.min.css", "text/css"),
         HLJS_DARK_CSS => asset!("github-dark.min.css", "text/css"),
+        COLOR_ICONS_JS => Asset {
+            bytes: include_bytes!(concat!(env!("OUT_DIR"), "/color-icons.js")),
+            mime: "text/javascript",
+        },
         "editor.ico" => asset!("editor.ico", "image/x-icon"),
         "viewer.ico" => asset!("viewer.ico", "image/x-icon"),
         _ => return None,
@@ -74,7 +80,7 @@ mod tests {
 
     #[test]
     fn all_named_assets_exist() {
-        for name in [HIGHLIGHT_JS, MERMAID_JS, PREVIEW_JS, BOOT_JS, MARKDOWN_CSS, HLJS_LIGHT_CSS, HLJS_DARK_CSS] {
+        for name in [HIGHLIGHT_JS, MERMAID_JS, PREVIEW_JS, BOOT_JS, MARKDOWN_CSS, HLJS_LIGHT_CSS, HLJS_DARK_CSS, COLOR_ICONS_JS] {
             assert!(!text(name).is_empty(), "{name}");
         }
         assert!(get("nope.js").is_none());

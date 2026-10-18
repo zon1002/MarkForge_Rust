@@ -10,6 +10,7 @@
 mod clipboard;
 mod insert;
 mod menu;
+mod menu_icons;
 mod settings;
 
 use std::borrow::Cow;
@@ -102,12 +103,13 @@ fn main() {
         .build(&event_loop)
         .expect("無法建立視窗");
 
-    let menu = AppMenu::build(&settings).expect("無法建立選單");
+    let mut menu = AppMenu::build(&settings).expect("無法建立選單");
     let hwnd = window_hwnd(&window);
     unsafe {
         let _ = menu.menu.init_for_hwnd(hwnd);
         let _ = menu.menu.set_theme_for_hwnd(hwnd, menu_theme(settings.dark));
     }
+    menu.icons.apply(windows::Win32::Foundation::HWND(hwnd as _));
     let menu_proxy = proxy.clone();
     MenuEvent::set_event_handler(Some(move |e: MenuEvent| {
         let _ = menu_proxy.send_event(UserEvent::Menu(e.id().0.clone()));
@@ -160,6 +162,11 @@ fn main() {
         *control_flow = ControlFlow::Wait;
         match event {
             Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => app.run_js("app.command('app.exit')"),
+            // 搬到不同縮放比例的螢幕：選單圖示換成對應尺寸
+            Event::WindowEvent { event: WindowEvent::ScaleFactorChanged { .. }, .. } => {
+                let hwnd = windows::Win32::Foundation::HWND(window_hwnd(&app.window) as _);
+                app.menu.icons.apply(hwnd);
+            }
             Event::UserEvent(UserEvent::Menu(id)) => app.run_js(&format!("app.command({})", js(&id))),
             Event::UserEvent(UserEvent::Ipc(body)) => {
                 if app.handle_ipc(&body) {
@@ -197,7 +204,6 @@ fn serve(request: &Request<Vec<u8>>, assets: &Arc<Mutex<DocumentAssets>>) -> Res
         "/" | "/index.html" => Some((web_file!("index.html").into(), "text/html; charset=utf-8")),
         "/app.css" => Some((web_file!("app.css").into(), "text/css")),
         "/app.js" => Some((web_file!("app.js").into(), "text/javascript")),
-        "/icons.js" => Some((web_file!("icons.js").into(), "text/javascript")),
         "/vendor/codemirror.js" => Some((web_file!("vendor/codemirror.js").into(), "text/javascript")),
         _ => {
             if let Some(name) = path.strip_prefix("/assets/") {

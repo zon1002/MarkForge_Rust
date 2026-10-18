@@ -9,7 +9,16 @@ MarkForge 隨附或編譯進以下第三方元件，各元件的著作權屬於�
 | CodeMirror 6（@codemirror/*、@lezer/*） | 6.x | MIT | <https://codemirror.net/> |
 | Mermaid | 11.17 | MIT | <https://mermaid.js.org/> |
 | highlight.js | 11.9 | BSD-3-Clause | <https://highlightjs.org/> |
-| Bootstrap Icons（工具列圖示） | 1.x | MIT | <https://icons.getbootstrap.com/> |
+
+## 圖示
+
+工具列、彈出選單與原生選單的彩色圖示（`crates/core/icons/*.svg`）為 MarkForge 自行繪製，隨本專案以相同條款發布，未使用第三方圖示集。
+
+## 建置工具（不會編譯進執行檔）
+
+| crate | 授權 | 用途 |
+|-------|------|------|
+| resvg | Apache-2.0 OR MIT | Editor 建置時把 SVG 圖示轉成各 DPI 尺寸的選單 PNG |
 
 ## Rust crate（編譯進執行檔）
 

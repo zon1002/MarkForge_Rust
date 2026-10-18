@@ -4,6 +4,7 @@ description = "MarkForge 共用核心：Markdown 渲染、HTML 頁面範本、�
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+build = "build.rs"
 
 [dependencies]
 comrak = { workspace = true }
