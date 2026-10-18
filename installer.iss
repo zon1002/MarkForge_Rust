@@ -14,12 +14,21 @@
 ; IPreviewHandler 的 ShellEx 機碼／64 位元 prevhost.exe 代理程序的 AppID
 #define PreviewShellEx "{{8895b1c6-b41f-4c1c-a562-0d564250836f}"
 #define PrevhostAppId  "{{6d2b5079-2f0b-48dd-ab7f-97cec514d30b}"
+; 與 v1.x 相同的 AppId（不含外層大括號）；解除安裝資訊在 HKLM 64 位元檢視
+#ifndef AppGuid
+  #define AppGuid    "{4C6B7E2D-9A3F-4D8E-B6C1-7F2A5E9D0B31}"
+#endif
+#ifndef UninstRoot
+  #define UninstRoot "HKLM64"
+#endif
 
 [Setup]
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
-AppId={{4C6B7E2D-9A3F-4D8E-B6C1-7F2A5E9D0B31}
+AppId={{#AppGuid}
+; 舊版已在安裝前完整移除；一律建立全新的解除安裝記錄
+UninstallLogMode=overwrite
 DefaultDirName={autopf}\{#AppNameEn}
 DefaultGroupName={#AppName}
 OutputDir=installer_output
@@ -53,15 +62,77 @@ begin
     DepsDownloadPage := CreateDownloadPage('正在下載相依元件', '請稍候，下載完成後會自動安裝。', nil);
 end;
 
-// 更新時先結束預覽程序（prevhost.exe 可能載著舊版處理常式 DLL），避免檔案被鎖住；
-// 檔案總管下次預覽時會自動重新啟動 prevhost。
+function IsProcessRunning(const ExeName: String): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := Exec(ExpandConstant('{cmd}'),
+    '/C tasklist /NH /FI "IMAGENAME eq ' + ExeName + '" | find /I "' + ExeName + '" >nul',
+    '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+end;
+
+// 只刪除確定是本程式安裝的資料夾：解除安裝程式就在該資料夾內，且不是磁碟根目錄或系統資料夾。
+function IsSafeToDelete(const Dir, UninstallerPath: String): Boolean;
+var
+  D: String;
+begin
+  D := Lowercase(RemoveBackslashUnlessRoot(Dir));
+  Result := (Length(D) > 3) and
+    (CompareText(RemoveBackslashUnlessRoot(ExtractFileDir(UninstallerPath)), RemoveBackslashUnlessRoot(Dir)) = 0) and
+    (D <> Lowercase(ExpandConstant('{commonpf64}'))) and (D <> Lowercase(ExpandConstant('{commonpf32}'))) and
+    (D <> Lowercase(ExpandConstant('{win}'))) and (D <> Lowercase(ExpandConstant('{sys}'))) and
+    (D <> Lowercase(GetEnv('USERPROFILE')));
+end;
+
+// 取代舊版（含 C#／.NET 版 v1.x）：先以舊版自己的解除安裝程式靜默移除（檔案、捷徑、登錄、
+// 舊的解除安裝記錄），再刪除舊安裝資料夾內剩下的所有檔案；本次安裝會建立全新的解除安裝程式，
+// 日後解除安裝可完整移除 Rust 版。
+procedure RemovePreviousVersion;
+var
+  Key, UninstallString, InstallDir, Uninstaller: String;
+  ResultCode, I: Integer;
+begin
+  Key := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#AppGuid}_is1';
+  if not RegQueryStringValue({#UninstRoot}, Key, 'UninstallString', UninstallString) then
+    exit;
+  Uninstaller := RemoveQuotes(UninstallString);
+  if not RegQueryStringValue({#UninstRoot}, Key, 'InstallLocation', InstallDir) then
+    InstallDir := ExtractFilePath(Uninstaller);
+
+  if FileExists(Uninstaller) then
+  begin
+    Exec(Uninstaller, '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    // 解除安裝程式會複製自己到暫存資料夾再執行第二階段；等它把自己刪掉（最多 30 秒）
+    for I := 1 to 60 do
+    begin
+      if not FileExists(Uninstaller) then
+        break;
+      Sleep(500);
+    end;
+  end;
+
+  if DirExists(InstallDir) and IsSafeToDelete(InstallDir, Uninstaller) then
+    DelTree(RemoveBackslashUnlessRoot(InstallDir), True, True, True);
+  // 舊版解除安裝失敗時登錄可能還在；刪除，避免新安裝附加到舊的解除安裝記錄
+  RegDeleteKeyIncludingSubkeys({#UninstRoot}, Key);
+end;
+
+// 安裝前：要求關閉執行中的 Editor／Viewer（避免遺失未存檔的內容），結束預覽程序
+// （prevhost.exe 可能載著舊版處理常式 DLL；檔案總管下次預覽時會自動重新啟動），然後移除舊版。
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ResultCode: Integer;
 begin
+  if IsProcessRunning('MarkForgeEditor.exe') or IsProcessRunning('MarkForge.Editor.exe') or
+     IsProcessRunning('MarkForgeViewer.exe') or IsProcessRunning('MarkForge.Viewer.exe') then
+  begin
+    Result := 'MarkForge Editor 或 Viewer 正在執行。請先儲存並關閉它們，再按「上一步」後重新「安裝」。';
+    exit;
+  end;
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM MarkForgePreviewHost.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM MarkForge.PreviewHost.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM prevhost.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  RemovePreviousVersion;
   Result := '';
 end;
 

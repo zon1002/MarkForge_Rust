@@ -22,7 +22,8 @@ MarkForge Markdown 工具組的版本歷程，最新版本在最前。格式參�
 ### 重大變更
 
 - **不再需要 .NET 8 Desktop Runtime**：只需要 Microsoft Edge WebView2 Runtime（Windows 11 已內建；安裝程式偵測不到時可自動下載）。
-- **安裝目錄改為單一資料夾**：`MarkForgeEditor.exe`、`MarkForgeViewer.exe`、`MarkForgePreviewHost.exe`、`MarkForgePreview.dll` 放在 `{app}` 下；升級時自動移除 v1.x 的 `Editor\`、`Viewer\`、`PreviewHandler\` 子資料夾。
+- **安裝目錄改為單一資料夾**：`MarkForgeEditor.exe`、`MarkForgeViewer.exe`、`MarkForgePreviewHost.exe`、`MarkForgePreview.dll` 放在 `{app}` 下。
+- **直接取代舊版**：安裝前先以舊版（含 v1.7.0）自己的解除安裝程式靜默移除，再刪除舊安裝資料夾內剩下的所有檔案，然後只寫入 Rust 版的檔案；解除安裝記錄一律重新建立（`UninstallLogMode=overwrite`），日後解除安裝可完整移除，不殘留 v1 的檔案或登錄。Editor／Viewer 執行中時會提示先關閉，避免遺失未存檔內容。
 - **預覽處理常式改為純 Rust COM**（新 CLSID `{57C7730F-A427-425D-92B1-CE2797C1C9CA}`）；升級時移除 v1.7.0 C++ 處理常式（`{05E77F8A-…}`）的登錄。
 - **設定檔**：Editor 設定存於 `%APPDATA%\MarkForge\editor.json`、Viewer 存於 `viewer.json`；v1.x 的設定不會自動移轉。
 
