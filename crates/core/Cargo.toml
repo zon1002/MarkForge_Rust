@@ -10,7 +10,7 @@ comrak = { workspace = true }
 regex = { workspace = true }
 scraper = "0.27"
 calamine = { version = "0.36", features = ["dates"] }
-chrono = { version = "0.4", default-features = false, features = ["std"] }
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 encoding_rs = "0.8"
 unicode-width = "0.2"
 ego-tree = "0.11"
